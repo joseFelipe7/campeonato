@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\PlayerController;
+use App\Http\Controllers\AuthController;
  
 
 /*
@@ -28,6 +29,18 @@ Route::prefix('player')->group(function () {
     Route::get('/list/{id}', [PlayerController::class, 'index']);
     
 });
+/** Router Auth */
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
+    
+    Route::get('/user-profile', [AuthController::class, 'userProfile']);  
+    //Route::post('/register', [AuthController::class, 'register']);
+
+});
+
+
 
 
 

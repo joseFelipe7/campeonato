@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-
 use App\Models\Player;
 
 
@@ -39,13 +38,11 @@ class PlayerController extends Controller
             if($playerEmailUsed){
                 return response()->json(array("message"=>"1 errors were found", "errors"=>array("email already used")), 422);
             }
-
-            $pass  = Hash::make($request->pass);
             
             $player = Player::create([
                                         'name' => $request->name, 
                                         'email' => $request->email, 
-                                        'password' => $pass
+                                        'password' => Hash::make($request->password)
                                     ]);
             return response()->json(array("message"=>"Created with success", "data"=>$player), 201);
         } catch (\Throwable $th) {
@@ -74,4 +71,5 @@ class PlayerController extends Controller
             return response()->json(array("message"=>"an unexpected error occurred","errors"=>array($th->getMessage())), 400) ;
         }
     }
+
 }
