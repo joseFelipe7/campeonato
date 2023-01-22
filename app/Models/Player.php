@@ -5,15 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class Player extends Model
 {
     use HasFactory;
-    /**
+     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'users';
+    protected $table = 'players';
+
     /**
      * The primary key associated with the table.
      *
@@ -21,9 +22,9 @@ class User extends Model
      */
     protected $primaryKey = 'id';
     /**
-     * Indicates if the model's ID is auto-incrementing.
+     * The attributes that are mass assignable.
      *
-     * @var bool
+     * @var array
      */
-    public $incrementing = true;
+    protected $fillable = ['name', 'email', 'password'];
 }
