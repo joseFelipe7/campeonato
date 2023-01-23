@@ -71,5 +71,13 @@ class PlayerController extends Controller
             return response()->json(array("message"=>"an unexpected error occurred","errors"=>array($th->getMessage())), 400) ;
         }
     }
+    public function secret(){
+        try {
+            return response()->json(array("message"=>"oi"));
+        } catch (\Throwable $th) {
+            return response()->json(array("message"=>"an unexpected error occurred","errors"=>array($th->getMessage())), 400) ;
+        }
+    }
+
 
 }

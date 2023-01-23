@@ -28,6 +28,8 @@ Route::prefix('player')->group(function () {
 
     Route::get('/list/{id}', [PlayerController::class, 'index']);
     
+    Route::get('/secret', [PlayerController::class, 'secret'])->middleware('AuthUser');
+    
 });
 /** Router Auth */
 Route::prefix('auth')->group(function () {
