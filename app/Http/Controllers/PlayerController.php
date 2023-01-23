@@ -51,27 +51,22 @@ class PlayerController extends Controller
     }
     public function update(Request $request){
         try {
-            $idPlayer = $request->$idPlayer;
-            $player = Player::where('id',  $idPlayer)->first();
+            $idPlayer = $request['player']['id'];
             
-            if(!$player){
-                return response()->json(array("message"=>"Player Not Found", "data"=>$player), 404);
-            }
-             
-            $pass  = $request->pass?Hash::make($request->pass):$player->password;
-            
-            $player = Player::where('id', $player->id)
+            Player::where('id', $idPlayer)
                             ->update([
                                 'name' => $request->name, 
-                                'email' => $request->email,
-                                'password' => $pass
+                                'password' => $request->pass?Hash::make($request->pass):$request['player']['password'],
                             ]);
+
+            $player = Player::where('id',  $idPlayer)->first();
+            
             return response()->json(array("message"=>"Updated with success", "data"=>$player), 200);
         } catch (\Throwable $th) {
             return response()->json(array("message"=>"an unexpected error occurred","errors"=>array($th->getMessage())), 400) ;
         }
     }
-    public function secret(){
+    public function secret(Request $request){
         try {
             return response()->json(array("message"=>"oi"));
         } catch (\Throwable $th) {

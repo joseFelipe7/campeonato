@@ -22,6 +22,7 @@ class AuthUser
             return response()->json(array("message"=>"authentication token must be sent"), 498);//401
         }
         if (auth()->user()) {
+            $request['player'] = auth()->user()->toArray();
             return $next($request);
         }
         return response()->json(array("message"=>"invalid authentication token","errors"=>[]), 498);//401
