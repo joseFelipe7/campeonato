@@ -23,13 +23,9 @@ use App\Http\Controllers\ChampionshipsController;
 /** Router of Players */
 Route::prefix('player')->group(function () {
     Route::get('/', [PlayerController::class, 'index']);
-
     Route::post('/', [PlayerController::class, 'created']);
-
-    Route::put('/', [PlayerController::class, 'update'])->middleware('AuthUser');;
-
+    Route::put('/', [PlayerController::class, 'update'])->middleware('AuthUser');
     Route::get('/list/{id}', [PlayerController::class, 'index']);
-    
     Route::get('/secret', [PlayerController::class, 'secret'])->middleware('AuthUser');
     
 });
@@ -44,7 +40,9 @@ Route::prefix('auth')->group(function () {
 /** Router Championship */
 Route::prefix('championship')->group(function () {
     Route::post('/created', [ChampionshipsController::class, 'createChampionships'])->middleware('AuthUser');  
-
+    Route::post('/{id}/match', [ChampionshipsController::class, 'createMatch'])->middleware('AuthUser');  
+    Route::get('/{id}/match/current', [ChampionshipsController::class, 'listCurrentMatchChampionship'])->middleware('AuthUser');  
+    
 });
 
 

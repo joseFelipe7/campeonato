@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ChampionshipPlayer extends Model
+class ChampionshipMatch extends Model
 {
     use HasFactory;
      /**
@@ -13,7 +13,7 @@ class ChampionshipPlayer extends Model
      *
      * @var string
      */
-    protected $table = 'championship_players';
+    protected $table = 'championship_matchs';
 
     /**
      * The primary key associated with the table.
@@ -26,7 +26,7 @@ class ChampionshipPlayer extends Model
      *
      * @var array
      */
-    protected $fillable = ['id_championship', 'id_player', 'points', 'defeats', 'ppm' ];
+    protected $fillable = ['id_championship', 'id_player_a', 'id_player_b', 'id_player_win', 'group', 'round', 'points' ];
 
     public function championship()
     {

@@ -18,10 +18,12 @@ class CreateChampionshipsTable extends Migration
             $table->integer('id_player_host');
             $table->integer('id_type_championship')->default(1);
             $table->string('name');
+            $table->integer('round_current')->default(0);
+            $table->integer('round_total');
             $table->timestamps();
         });
     }
-
+    
     /**
      * Reverse the migrations.
      *

@@ -34,7 +34,10 @@ class Player extends Authenticatable implements JWTSubject
     protected $fillable = ['name', 'email', 'password'];
 
 
-
+    public function championship()
+    {
+        return $this->hasOne(championship::class);
+    }
 
 
 

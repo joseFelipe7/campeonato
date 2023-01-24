@@ -26,5 +26,19 @@ class Championship extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'id_player_host',  'id_type_championship' ];
+    protected $fillable = ['id_player_host',  'id_type_championship', 'name', 'round_current', 'round_total'];
+    
+    
+    public function playerHost()
+    {
+        return $this->belongsTo(Player::class, 'id_player_host');
+    }
+    public function championshipPlayer()
+    {
+        return $this->hasMany(ChampionshipPlayer::class, 'id_championship');
+    }
+    public function championshipMatch()
+    {
+        return $this->hasMany(ChampionshipMatch::class, 'id_championship');
+    }
 }
