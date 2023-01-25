@@ -7,13 +7,8 @@ use Validator;
 
 class AuthController extends Controller
 {
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
     public function __construct() {
-        //$this->middleware('auth:api', ['except' => ['login', 'register']]);
+    
     }
     
     public function login(Request $request){
@@ -23,18 +18,18 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return getReturnErrorsValidator($validator); //helper function
         }
 
         if (!$token = auth()->attempt($validator->validated())) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(array("message"=>"wrong credentials", "errors"=>["Your password is incorrect. check it out"]) ,401);
         }
         return $this->createNewToken($token);
     }
 
     public function logout() {
         auth()->logout();
-        return response()->json(['message' => 'User successfully signed out']);
+        return response()->json(array("message"=>"User successfully signed out") ,401);
     }
     
     public function refresh() {
@@ -47,10 +42,12 @@ class AuthController extends Controller
     
     protected function createNewToken($token){
         return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
-            'user' => auth()->user()
+            "data"=>[
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => auth()->factory()->getTTL() * 60,
+                'user' => auth()->user()
+            ]
         ]);
     }
 }

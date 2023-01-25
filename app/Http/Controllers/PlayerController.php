@@ -23,7 +23,7 @@ class PlayerController extends Controller
     public function created(Request $request){
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|max:255',
+                'name' => 'required|min:5|max:255',
                 'email' => 'required|email',
                 'password'=> 'required'
             ],[
@@ -31,7 +31,7 @@ class PlayerController extends Controller
             ]);
      
             if ($validator->fails()) {
-                return response()->json(array("message"=>count($validator->errors())." errors were found", "errors"=>array($validator->errors())) ,422);
+                return getReturnErrorsValidator($validator); //helper function
             }
            
             $playerEmailUsed = Player::where('email',  $request->email)->first();
@@ -44,13 +44,23 @@ class PlayerController extends Controller
                                         'email' => $request->email, 
                                         'password' => Hash::make($request->password)
                                     ]);
-            return response()->json(array("message"=>"Created with success", "data"=>$player), 201);
+
+            return response()->json(array("message"=>"Created with success", "data"=>Player::Find($player->id)), 201);
+        
         } catch (\Throwable $th) {
             return response()->json(array("message"=>"an unexpected error occurred","errors"=>array($th->getMessage())), 400) ;
         }
     }
     public function update(Request $request){
         try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|max:255',
+            ]);
+            
+            if ($validator->fails()) {
+                return getReturnErrorsValidator($validator); //helper function
+            }
+            
             $idPlayer = $request['player']['id'];
             
             Player::where('id', $idPlayer)
