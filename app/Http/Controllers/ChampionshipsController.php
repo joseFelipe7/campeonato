@@ -54,7 +54,7 @@ class ChampionshipsController extends Controller
         try {
 
             $idPlayer = $request['player']['id'];
-            
+            //criar um middleware
             $championship = Championship::where('id',$id)
                                         ->where('id_player_host', $idPlayer)
                                         ->get()
@@ -62,6 +62,7 @@ class ChampionshipsController extends Controller
             if(!$championship){
                 return response()->json(array("message"=>"permission denied for this championship", "errors"=>array("this championship does not belong to this user")), 401);
             }
+            
             if(Championship::find($id)->championshipMatch->where('id_player_win', null)->count()){
                 return response()->json(array("message"=>"unfinished matches", "errors"=>array("This round still has pending matches")), 401);
             }
@@ -97,7 +98,7 @@ class ChampionshipsController extends Controller
                         'id_player_b' => $arrayPlayers[$i+1]['id_player'],
                         'group' => ($i/2)+1, 
                         'round' => $championship['round_current']+1,
-                        'points' => 1/(pow(2, $arrayPlayers[$i]['defeats'])*$arrayPlayers[$i]['ppm'])
+                        'points' => $arrayPlayers[$i]['ppm']
                     ]);
                 }
 
@@ -116,7 +117,7 @@ class ChampionshipsController extends Controller
                         'id_player_b' => $playersMatch[$i+1]['id_player_win'],
                         'group' => ($i/2)+1, 
                         'round' => $championship['round_current']+1,
-                        'points' => 1/(pow(2,$player->defeats)*$player->ppm)
+                        'points' => $player->ppm
                     ]);
                 }
                 
@@ -131,7 +132,7 @@ class ChampionshipsController extends Controller
     public function listCurrentMatchChampionship(Request $request, $id){
 
         $idPlayer = $request['player']['id'];
-
+        //criar um middleware
         $championship = Championship::where('id',$id)
                         ->where('id_player_host', $idPlayer)
                         ->get()
@@ -139,16 +140,72 @@ class ChampionshipsController extends Controller
         if(!$championship){
             return response()->json(array("message"=>"permission denied for this championship", "errors"=>array("this championship does not belong to this user")), 401);
         }
-        
         $currentMatch = Championship::find($id)->championshipMatch->where('round', $championship->round_current);
+        if(count($currentMatch) == 0){
+            return response()->json(array("message"=>"no matches happening at the moment","data"=>array_values($currentMatch->toArray())), 200);//204
+        }
 
         return response()->json(array("data"=>array_values($currentMatch->toArray())), 200);
 
         
     }
-    public function endMatch(Request $request){
+    public function endMatch(Request $request, $id, $idMatch){
         try {
-            //code...
+             $validator = Validator::make($request->all(), [
+                'id_player_win'=> 'required|integer',
+            ],[
+                'id_player_win.required' => 'id_player_win is required.',
+                'id_player_win.integer' => 'must be integer value'
+            ]);
+            if ($validator->fails()) {
+                return response()->json(array("message"=>count($validator->errors())." errors were found", "errors"=>array($validator->errors())) ,422);
+            }
+            //criar um middleware
+            $idPlayer = $request['player']['id'];
+
+            $championship = Championship::where('id',$id)
+                        ->where('id_player_host', $idPlayer)
+                        ->get()
+                        ->first();
+            if(!$championship){
+                return response()->json(array("message"=>"permission denied for this championship", "errors"=>array("this championship does not belong to this user")), 401);
+            }
+            
+            $championshipMatch = Championship::find($id)
+                                            ->championshipMatch
+                                            ->where('id', $idMatch)
+                                            ;
+            $championshipMatchData = array_values($championshipMatch->toArray());
+            
+            if(!$championshipMatchData){
+                return response()->json(array("message"=>"permission denied for this match", "errors"=>array("this match does not belong to this user")), 401);
+            }
+            if($championshipMatchData[0]['id_player_win'] != null){
+                return response()->json(array("message"=>"finished match", "errors"=>array("this game has already ended")), 304);//304
+            }
+            if($championshipMatchData[0]['id_player_a'] != $request->id_player_win && $championshipMatchData[0]['id_player_b'] != $request->id_player_win){
+                return response()->json(array("message"=>"id_player_win invalid", "errors"=>array("player does not participate in this game")), 422);
+            }
+
+
+            ChampionshipMatch::where('id', $idMatch)->update([
+                'id_player_win' => $request->id_player_win
+            ]);
+            ChampionshipPlayer::where('id_championship',$id)
+                              ->where('id_player',$request->id_player_win)
+                              ->increment('points',$championshipMatchData[0]['points']);
+            $playerLoser = $request->id_player_win==$championshipMatchData[0]['id_player_a'] ?$championshipMatchData[0]['id_player_b']:$championshipMatchData[0]['id_player_a'];
+
+            $championshipPlayer = ChampionshipPlayer::where('id_championship',$id)
+                                                    ->where('id_player',$playerLoser)
+                                                    ->first();
+
+            $championshipPlayer->defeats += 1;
+            $championshipPlayer->ppm = $championshipPlayer->ppm/(pow(2, $championshipPlayer->defeats));
+            $championshipPlayer->save();
+
+            return response()->json(array("data"=>$championshipMatch), 200);
+
         } catch (\Throwable $th) {
             return response()->json(array("message"=>"an unexpected error occurred","errors"=>array($th->getMessage())), 400) ;
         }

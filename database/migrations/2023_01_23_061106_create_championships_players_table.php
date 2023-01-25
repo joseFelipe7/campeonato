@@ -19,7 +19,7 @@ class CreateChampionshipsPlayersTable extends Migration
             $table->integer('id_player');
             $table->float('points')->default(0);
             $table->integer('defeats')->default(0);
-            $table->integer('ppm')->default(1);
+            $table->float('ppm')->default(1);
             $table->timestamps();
         });
     }

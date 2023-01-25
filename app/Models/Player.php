@@ -26,6 +26,7 @@ class Player extends Authenticatable implements JWTSubject
      * @var string
      */
     protected $primaryKey = 'id';
+    
     /**
      * The attributes that are mass assignable.
      *

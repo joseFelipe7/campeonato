@@ -28,7 +28,8 @@ Route::prefix('player')->group(function () {
     Route::get('/list/{id}', [PlayerController::class, 'index']);
     Route::get('/secret', [PlayerController::class, 'secret'])->middleware('AuthUser');
     
-});
+});   
+ 
 /** Router Auth */
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -37,11 +38,13 @@ Route::prefix('auth')->group(function () {
     Route::get('/user-profile', [AuthController::class, 'userProfile']);  
 
 });
+
 /** Router Championship */
 Route::prefix('championship')->group(function () {
     Route::post('/created', [ChampionshipsController::class, 'createChampionships'])->middleware('AuthUser');  
     Route::post('/{id}/match', [ChampionshipsController::class, 'createMatch'])->middleware('AuthUser');  
     Route::get('/{id}/match/current', [ChampionshipsController::class, 'listCurrentMatchChampionship'])->middleware('AuthUser');  
+    Route::post('/{id}/match/{idMatch}/finished', [ChampionshipsController::class, 'endMatch'])->middleware('AuthUser');  
     
 });
 
