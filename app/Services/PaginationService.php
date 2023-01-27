@@ -62,6 +62,8 @@ class PaginationService
                 ];
         
     }
-
+    public static function itemStartPage($page, $itensPerPage){
+        return ($page-1)*$itensPerPage;
+    }
     
 }

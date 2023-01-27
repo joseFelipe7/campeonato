@@ -97,7 +97,7 @@ class FriendController extends Controller
     
     protected function friendsConfirmed($idPlayer, $page, $itensPerPage, $sort, $filter){
        
-        $startPosition = ($page-1)*$itensPerPage;
+        $startPosition = PaginationService::itemStartPage($page, $itensPerPage);
 
         $sort = PaginationService::querySort($sort);
         $filter = PaginationService::queryFilter($filter, ['name'], "AND");            
@@ -132,7 +132,7 @@ class FriendController extends Controller
     
     protected function friendsRecived($idPlayer, $page, $itensPerPage, $sort, $filter){
 
-        $startPosition = ($page-1)*$itensPerPage;
+        $startPosition = PaginationService::itemStartPage($page, $itensPerPage);
 
         $sort = PaginationService::querySort($sort);
         $filter = PaginationService::queryFilter($filter, ['name'], "AND");        

@@ -24,7 +24,7 @@ use App\Http\Controllers\FriendController;
 
 /** Router of Players */
 Route::prefix('player')->group(function () {
-    Route::get('/', [PlayerController::class, 'index']);
+    Route::get('/', [PlayerController::class, 'index'])->middleware('AuthUser');
     Route::post('/', [PlayerController::class, 'created']);
     Route::put('/', [PlayerController::class, 'update'])->middleware('AuthUser');
     Route::get('/list/{id}', [PlayerController::class, 'index']);
