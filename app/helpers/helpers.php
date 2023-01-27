@@ -9,3 +9,5 @@ if (! function_exists('getReturnErrorsValidator')) {
         return response()->json(array("message"=>count($validator->errors())." errors were found", "errors"=>$errors) ,422);
     }
 }
+
+

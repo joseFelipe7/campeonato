@@ -144,10 +144,10 @@ class ChampionshipsController extends Controller
 
         $currentMatch = Championship::find($id)->championshipMatch->where('round', $championship->round_current);
         if(count($currentMatch) == 0){
-            return response()->json(array("message"=>"no matches happening at the moment","data"=>array_values($currentMatch->toArray())), 200);//204
+            return response()->json(array("message"=>"no matches happening at the moment","data"=>["matchs"=>array_values($currentMatch->toArray())]), 200);//204
         }
 
-        return response()->json(array("data"=>array_values($currentMatch->toArray())), 200);
+        return response()->json(array("data"=>["matchs"=>array_values($currentMatch->toArray())]), 200);
 
         
     }
@@ -163,7 +163,7 @@ class ChampionshipsController extends Controller
             if ($validator->fails()) {
                 return getReturnErrorsValidator($validator); //helper function
             }
-            
+
             $idPlayer = $request['player']['id'];
 
             $championship =  $this->championshipBelongsPlayer($id, $idPlayer);
@@ -209,7 +209,9 @@ class ChampionshipsController extends Controller
             return response()->json(array("message"=>"an unexpected error occurred","errors"=>array($th->getMessage())), 400) ;
         }
     }
-
+    /**
+     * Internal Functions
+     */
     protected function championshipBelongsPlayer($id, $idPlayerHost){
          $championship = Championship::where('id',$id)
                                     ->where('id_player_host', $idPlayerHost)

@@ -6,6 +6,8 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChampionshipsController;
+use App\Http\Controllers\FriendController;
+
  
 
 
@@ -47,6 +49,16 @@ Route::prefix('championship')->group(function () {
     Route::post('/{id}/match/{idMatch}/finished', [ChampionshipsController::class, 'endMatch'])->middleware('AuthUser');  
     
 });
+
+
+/** Router Friend */
+Route::prefix('friend')->group(function () {
+    
+    Route::get('/', [FriendController::class, 'listFriends'])->middleware('AuthUser');
+    Route::get('/pending', [FriendController::class, 'listRecived'])->middleware('AuthUser');
+    
+});
+
 
 
 
