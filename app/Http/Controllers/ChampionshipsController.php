@@ -140,9 +140,9 @@ class ChampionshipsController extends Controller
         if(!$championship){
             return response()->json(array("message"=>"permission denied for this championship", "errors"=>array("this championship does not belong to this user")), 401);
         }
-            
 
         $currentMatch = Championship::find($id)->championshipMatch->where('round', $championship->round_current);
+        
         if(count($currentMatch) == 0){
             return response()->json(array("message"=>"no matches happening at the moment","data"=>["matchs"=>array_values($currentMatch->toArray())]), 200);//204
         }

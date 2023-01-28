@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
 use App\Models\Friend;
+use App\Models\Player;
 use App\Services\PaginationService;
 
 
@@ -91,6 +92,52 @@ class FriendController extends Controller
             return response()->json(array("message"=>"an unexpected error occurred","errors"=>array($th->getMessage())), 400) ;
         }
     }
+    public function sendInviteFriend(Request $request){
+        $validator = Validator::make($request->all(), [
+            'id_player' => 'required|integer',
+        ]);
+        if ($validator->fails()) {
+            return getReturnErrorsValidator($validator); //helper function
+        }
+
+        $idPlayer = $request['player']['id'];
+        $idPlayerFriend = $request->id_player;
+
+        if(!Player::find($idPlayerFriend)) return response()->json(array("message"=>"non-existent player", "errors"=>array("player id not found in database")), 422);
+        
+        if( Friend::where('id_player_send', $idPlayer)->where('id_player_recived', $idPlayerFriend)->count()){
+            return response()->json(array("message"=>"existing friend request", "errors"=>array("friend request already sent")), 422);
+        }
+        if( Friend::where('id_player_send', $idPlayerFriend)->where('id_player_recived', $idPlayer)->count()){
+            return response()->json(array("message"=>"existing friend request", "errors"=>array("friend request already received")), 422);
+        }
+
+        $friend = Friend::create([
+            'id_player_send' => $idPlayer,  
+            'id_player_recived' => $idPlayerFriend
+        ]);
+
+        return response()->json(array("message"=>"Created with success", "data"=>["friend"=>Friend::Find($friend->id)]), 201);
+
+    }
+    public function responseInviteFriend(Request $request, $id){
+        
+        $idPlayer = $request['player']['id'];
+        
+        $friend = Friend::find($id);
+
+        if(!$friend) return response()->json(array("message"=>"non-existent friend invite", "errors"=>array("friend id not found in database")), 422);
+        
+        if(!($friend->id_player_recived == $idPlayer)) return response()->json(array("message"=>"permission denied for this invite", "errors"=>array("this invite friend does not belong to this user")), 401);
+
+        if($friend->accept != 0) return response()->json(array("message"=>"invitation already answered", "errors"=>array("this friend request has already been answered")), 422);
+
+        $friend->accept = 1;
+        $friend->save();
+        
+        return response()->json(array("message"=>"Updated with success", "data"=>["friend"=>$friend]), 200);
+
+    }
     /**
      * Internal Functions
      */
@@ -150,6 +197,7 @@ class FriendController extends Controller
                     );
 
     }
+
     protected function totalFriendsRecived($idPlayer, $filter){
         
         $filter = PaginationService::queryFilter($filter, ['name'], "AND");        
@@ -164,35 +212,4 @@ class FriendController extends Controller
 
         return $totalItens[0]->total_friends;
     }
-    // /*All Friends Accept or NOT*/
-    // SELECT 
-    // p.name,
-    // f.*
-    // FROM friends f
-    // LEFT JOIN players p ON (p.id = f.id_player_send OR p.id = f.id_player_recived) AND p.id != 1 
-    // where f.id_player_send = 1 OR f.id_player_recived = 1;
-
-    // /*All Friends Accept*/
-    // SELECT 
-    // p.name,
-    // f.*
-    // FROM friends f
-    // LEFT JOIN players p ON (p.id = f.id_player_send OR p.id = f.id_player_recived) AND p.id != 1 
-    // where (f.id_player_send = 1 OR f.id_player_recived = 1) AND f.accept = 1;
-
-    // /*All Send Friends pedding*/
-    // SELECT 
-    // p.name,
-    // f.*
-    // FROM friends f
-    // LEFT JOIN players p ON p.id = f.id_player_recived
-    // where f.id_player_send = 1 AND f.accept = 0;
-
-    // /*All recived Friends pedding*/
-    // SELECT 
-    // p.name,
-    // f.*
-    // FROM friends f
-    // LEFT JOIN players p ON p.id = f.id_player_send
-    // where f.id_player_recived = 1 AND f.accept = 0;
 }

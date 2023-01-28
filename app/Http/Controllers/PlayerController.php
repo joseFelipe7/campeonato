@@ -77,7 +77,7 @@ class PlayerController extends Controller
                                         'password' => Hash::make($request->password)
                                     ]);
 
-            return response()->json(array("message"=>"Created with success", "data"=>Player::Find($player->id)), 201);
+            return response()->json(array("message"=>"Created with success", "data"=>["player"=>Player::Find($player->id)]), 201);
         
         } catch (\Throwable $th) {
             return response()->json(array("message"=>"an unexpected error occurred","errors"=>array($th->getMessage())), 400) ;
@@ -103,7 +103,7 @@ class PlayerController extends Controller
 
             $player = Player::where('id',  $idPlayer)->first();
             
-            return response()->json(array("message"=>"Updated with success", "data"=>$player), 200);
+            return response()->json(array("message"=>"Updated with success", "data"=>["player"=>$player]), 200);
         } catch (\Throwable $th) {
             return response()->json(array("message"=>"an unexpected error occurred","errors"=>array($th->getMessage())), 400) ;
         }

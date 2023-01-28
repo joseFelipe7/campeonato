@@ -55,7 +55,10 @@ Route::prefix('championship')->group(function () {
 Route::prefix('friend')->group(function () {
     
     Route::get('/', [FriendController::class, 'listFriends'])->middleware('AuthUser');
+    Route::post('/', [FriendController::class, 'sendInviteFriend'])->middleware('AuthUser');
+    Route::put('/{id}', [FriendController::class, 'responseInviteFriend'])->middleware('AuthUser');
     Route::get('/pending', [FriendController::class, 'listRecived'])->middleware('AuthUser');
+    
     
 });
 
