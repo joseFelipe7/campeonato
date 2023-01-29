@@ -19,12 +19,12 @@ class AuthUser
     public function handle(Request $request, Closure $next)
     {
         if(!$request->bearerToken()){
-            return response()->json(array("message"=>"unauthenticated", "errors"=>["authentication token must be sent"]), 498);//401
+            return response()->json(array("message"=>"unauthenticated", "errors"=>["authentication token must be sent"]), 401);//401
         }
         if (auth()->user()) {
             $request['player'] = auth()->user()->toArray();
             return $next($request);
         }
-        return response()->json(array("message"=>"unauthenticated","errors"=>["invalid authentication token"]), 498);//401
+        return response()->json(array("message"=>"unauthenticated","errors"=>["invalid authentication token"]), 401);//401
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Championship;
 use App\Models\ChampionshipPlayer;
 use App\Models\ChampionshipMatch;
 use App\Models\Player;
+use App\Models\Friend;
 
 
 class ChampionshipsController extends Controller
@@ -30,7 +31,17 @@ class ChampionshipsController extends Controller
             if(log(count($request->players),2)%1 && count($request->players)>1){
                 return response()->json(array("message"=>"select a valid amount of players", "errors"=>array("number of players not supported for a championship in this format must be a potential number of 2")) ,422);
             };
+
             $idPlayer = $request['player']['id'];
+
+            foreach($request->players as $player){
+                $friend = Friend::where(function ($q) use ($idPlayer, $player) { $q->where('id_player_send', $idPlayer)->where('id_player_recived', $player)->where('accept',1);})
+                                ->orWhere(function ($q) use ($idPlayer, $player) { $q->where('id_player_send', $player)->where('id_player_recived', $idPlayer)->where('accept',1);})
+                                ->get()
+                                ->toArray();
+
+                if(!$friend) return response()->json(array("message"=>"no friendship", "errors"=>array("championship players must be friends with the host")) ,422);
+            }
 
             $championship = Championship::create([
                 'name' => $request->name, 
@@ -45,7 +56,7 @@ class ChampionshipsController extends Controller
                     'id_player' => $player,
                 ]);
             }
-            
+
             $championship->players=$players;
 
             return response()->json(array("message"=>"Created with success", "data"=>array("championship"=>$championship)), 201);

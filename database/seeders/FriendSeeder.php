@@ -18,6 +18,38 @@ class FriendSeeder extends Seeder
         DB::table('friends')->insert([
             [
                 'id_player_send' => 1,
+                'id_player_recived' => 2,
+                'accept' => 0,
+            ],[
+                'id_player_send' => 1,
+                'id_player_recived' => 3,
+                'accept' => 1,
+            ],[
+                'id_player_send' => 1,
+                'id_player_recived' => 4,
+                'accept' => 1,
+            ],[
+                'id_player_send' => 1,
+                'id_player_recived' => 5,
+                'accept' => 0,
+            ],[
+                'id_player_send' => 6,
+                'id_player_recived' => 1,
+                'accept' => 0,
+            ],[
+                'id_player_send' => 7,
+                'id_player_recived' => 1,
+                'accept' => 0,
+            ],[
+                'id_player_send' => 8,
+                'id_player_recived' => 1,
+                'accept' => 1,
+            ],[
+                'id_player_send' => 9,
+                'id_player_recived' => 1,
+                'accept' => 1,
+            ],[
+                'id_player_send' => 1,
                 'id_player_recived' => 12,
                 'accept' => 0,
             ],[

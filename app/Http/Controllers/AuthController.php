@@ -29,7 +29,7 @@ class AuthController extends Controller
 
     public function logout() {
         auth()->logout();
-        return response()->json(array("message"=>"User successfully signed out") ,401);
+        return response()->json(array("message"=>"User successfully signed out"), 200);
     }
     
     public function refresh() {
