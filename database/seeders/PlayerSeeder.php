@@ -17,7 +17,7 @@ class PlayerSeeder extends Seeder
     public function run()
     {
         for($i = 0; $i < 20; $i++){
-            DB::table('Players')->insert([
+            DB::table('players')->insert([
                 'name' => 'Player '.($i+1).' '.Str::random(6),
                 'email' => Str::random(10).'@email.com',
                 'password' => Hash::make('123'),
