@@ -13,7 +13,7 @@ class Championship extends Model
 
     protected $primaryKey = 'id';
 
-    protected $fillable = ['id_player_host',  'id_type_championship', 'name', 'round_current', 'round_total'];
+    protected $fillable = ['id_player_host',  'id_type_championship', 'id_player_win', 'name', 'round_current', 'round_total'];
     
     
     public function playerHost(){

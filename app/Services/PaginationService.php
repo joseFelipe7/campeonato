@@ -23,26 +23,26 @@ class PaginationService
         return true;
     }
 
-    public static function querySort($sort){
+    public static function querySort($sort, $aliasTable = ''){
         if(!$sort) return "";
 
         if($sort[0] == '-'){
-           return "ORDER BY ".substr($sort, 1)." DESC";
+           return "ORDER BY ". ($aliasTable?"$aliasTable.":"")  .substr($sort, 1)." DESC";
         }
 
-        return "ORDER BY ".$sort." ASC";
+        return "ORDER BY ". ($aliasTable?"$aliasTable.":"") .$sort." ASC";
     }
 
-    public function queryFilter($filter, $searchItens, $concat = ''){
+    public function queryFilter($filter, $searchItens, $concat = '', $aliasTable = ''){
         $filters = [];
         foreach ($filter as $key => $value) {
             
             if($key == 'search'){
                 foreach ($searchItens as $search) {
-                    $filters[] = "$search like '%$value%'";
+                    $filters[] = ($aliasTable?"$aliasTable.":"") . "$search like '%$value%'";
                 }
             }else{
-                $filters[] = "$key like '%$value%'";
+                $filters[] = ($aliasTable?"$aliasTable.":"") . "$key like '%$value%'";
             }
             
         }

@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use App\Models\Championship;
 use App\Models\ChampionshipPlayer;
 use App\Models\ChampionshipMatch;
 use App\Models\Player;
 use App\Models\Friend;
+use App\Services\PaginationService;
 
 
 class ChampionshipsController extends Controller
@@ -64,6 +66,44 @@ class ChampionshipsController extends Controller
             return response()->json(array("message"=>"an unexpected error occurred","errors"=>array($th->getMessage())), 400) ;
         }
     }
+    public function listChampionships(Request $request){
+        try {
+            
+            $validator = Validator::make($request->all(), [
+                'page' => 'integer',
+                'per_page' => 'integer'
+            ]);
+
+            if ($validator->fails()) return getReturnErrorsValidator($validator); //helper function
+
+            $idPlayer = $request['player']['id'];
+            $page = $request->query('page',1);
+            $perPage = $request->query('per_page',5);
+            $sort = $request->query('sort',null);
+            $filter = $request->query('filter',[]);
+
+            if (!PaginationService::validSort($sort, ['name', 'created_at'])){
+                return response()->json(array("message"=>"1 errors were found","errors"=>["invalid attribute or format of sort"]), 400) ;
+            }
+
+            if (!PaginationService::validFilter($filter, ['name'])){
+                return response()->json(array("message"=>"1 errors were found","errors"=>["invalid attribute or format of filter"]), 400) ;
+            }
+            
+            $championshipData = $this->championshipPlayer($idPlayer,$page, $perPage, $sort, $filter);
+            $totalChampionship= $this->totalChampionshipPlayer($idPlayer, $filter);
+
+            $meta =  PaginationService::transformMeta($page, $perPage, $totalChampionship);
+
+            return response()->json(array(
+                                        "meta"=>$meta, 
+                                        "data"=>["championships"=>$championshipData]
+                                    ), 200);
+
+        } catch (\Throwable $th) {
+            return response()->json(array("message"=>"an unexpected error occurred","errors"=>array($th->getMessage())), 400) ;
+        }
+    }
     public function createMatch(Request $request, $id){
         try {
 
@@ -84,10 +124,17 @@ class ChampionshipsController extends Controller
                     'round_current' => $championship['round_current']+1,
                 ]);    
             }else{
-
+               
                 $finalMatchs = array_values(Championship::find($id)->championshipMatch->where('round',$championship->round_current)->sortBy("group")->toArray());
-
+                
+                if(!$championship['id_player_win']){
+                    Championship::where('id',$id)->update([
+                        'id_player_win' => $finalMatchs[0]['id_player_win'],
+                    ]); 
+                }
+                 
                 $playerWin = Player::find($finalMatchs[0]['id_player_win']);
+                
                 
                 return response()->json(array("message"=>"championship ended the winner was ".$playerWin->name, "data"=>array("player_win"=>$playerWin)), 201);
             }
@@ -233,5 +280,49 @@ class ChampionshipsController extends Controller
             return false;
         }
         return $championship;
+    }
+    protected function championshipPlayer($idPlayer, $page, $itensPerPage, $sort, $filter){
+       
+        $startPosition = PaginationService::itemStartPage($page, $itensPerPage);
+
+        $sort = PaginationService::querySort($sort, "c");
+        $filter = PaginationService::queryFilter($filter, ['name'], "AND", "c");            
+        
+        return DB::select("SELECT 
+                                c.id, 
+                                c.id_player_host,
+                                c.id_type_championship, 
+                                c.id_player_win, 
+                                c.name,
+                                p.name player_win, 
+                                c.round_current, 
+                                c.round_total, 
+                                c.created_at, 
+                                c.updated_at
+                            FROM 
+                                championships c
+                            LEFT JOIN players p ON c.id_player_win = p.id
+                            WHERE id_player_host = ? $filter
+                            $sort
+                            LIMIT $startPosition, $itensPerPage",
+                            [$idPlayer]
+                        );
+
+    }
+
+    protected function totalChampionshipPlayer($idPlayer, $filter){
+
+        $filter = PaginationService::queryFilter($filter, ['name'], "AND", "c");
+
+        $totalItens = DB::select("SELECT 
+                                        COUNT(c.id) as total_championship
+                                    FROM 
+                                        championships c
+                                    LEFT JOIN players p ON c.id_player_win = p.id
+                                    WHERE id_player_host = ? $filter", 
+                                    [$idPlayer]
+                            );
+        return $totalItens[0]->total_championship;
+
     }
 }

@@ -44,6 +44,7 @@ Route::prefix('auth')->group(function () {
 /** Router Championship */
 Route::prefix('championship')->group(function () {
     Route::post('/created', [ChampionshipsController::class, 'createChampionships'])->middleware('AuthUser');  
+    Route::get('/', [ChampionshipsController::class, 'listChampionships'])->middleware('AuthUser');  
     Route::post('/{id}/match', [ChampionshipsController::class, 'createMatch'])->middleware('AuthUser');  
     Route::get('/{id}/match/current', [ChampionshipsController::class, 'listCurrentMatchChampionship'])->middleware('AuthUser');  
     Route::post('/{id}/match/{idMatch}/finished', [ChampionshipsController::class, 'endMatch'])->middleware('AuthUser');  

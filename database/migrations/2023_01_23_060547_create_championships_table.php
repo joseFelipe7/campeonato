@@ -17,6 +17,7 @@ class CreateChampionshipsTable extends Migration
             $table->id();
             $table->integer('id_player_host');
             $table->integer('id_type_championship')->default(1);
+            $table->integer('id_player_win')->nullable();
             $table->string('name');
             $table->integer('round_current')->default(0);
             $table->integer('round_total');
