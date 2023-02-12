@@ -151,6 +151,7 @@ class FriendController extends Controller
         
         return DB::select("SELECT 
                                 f.id,
+                                p.id id_friend,
                                 p.name,
                                 f.*
                             FROM friends f
