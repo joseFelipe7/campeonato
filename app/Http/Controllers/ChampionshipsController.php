@@ -203,14 +203,13 @@ class ChampionshipsController extends Controller
             return response()->json(array("message"=>"permission denied for this championship", "errors"=>array("this championship does not belong to this user")), 401);
         }
 
-        //$currentMatch = Championship::find($id)->championshipMatch->where('round', $championship->round_current);
         $currentMatch = DB::select("SELECT 
                                         cm.id, cm.id_championship, cm.id_player_a, cm.id_player_b, cm.id_player_win, pa.name as player_a, pb.name as player_b, cm.group, cm.round, cm.points, cm.created_at, cm.updated_at
                                     FROM championships c    
                                     JOIN championship_matchs cm ON cm.id_championship = c.id AND cm.round = c.round_current
                                     JOIN players pa ON pa.id = cm.id_player_a
                                     JOIN players pb ON pb.id = cm.id_player_b
-                                    WHERE c.id = 1");   
+                                    WHERE c.id = ?",[$id]);   
 
         if(count($currentMatch) == 0){
             return response()->json(array("message"=>"no matches happening at the moment","data"=>["matchs"=>array_values($currentMatch)]), 200);//204
