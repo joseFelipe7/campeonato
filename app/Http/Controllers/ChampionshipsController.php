@@ -94,7 +94,7 @@ class ChampionshipsController extends Controller
             $totalChampionship= $this->totalChampionshipPlayer($idPlayer, $filter);
 
             foreach($championshipData as $key => $data){
-                $championshipData[$key]->total_players = Championship::find($data->id_type_championship)->championshipPlayer->count() ;
+                $championshipData[$key]->total_players = Championship::find($data->id)->championshipPlayer->count() ;
             }
 
             $meta =  PaginationService::transformMeta($page, $perPage, $totalChampionship);
