@@ -14,7 +14,7 @@ https://documenter.getpostman.com/view/12476316/2s935hQSjR
 
 ## Start
 
-Para rodar o projeto primeira vez:
+Para rodar o projeto primeira vez execute os comandos:
 
 ```
 php artisan migrate
